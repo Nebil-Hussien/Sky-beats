@@ -1,0 +1,34 @@
+#  Data
+data/*
+!data/.gitkeep
+# committed example inputs (see data/README.md for sources + licenses)
+!data/README.md
+!data/spotify_weather_merged.csv
+!data/spotify_germany.csv
+!data/spotify_weather_daily_merged.csv
+results/*
+!results/.gitkeep
+
+#  Python 
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.ipynb_checkpoints/
+
+# Snakemake
+.snakemake/
+
+#  Logs (generated at runtime; keep the dirs via .gitkeep)
+*.log
+
+#  OS / editor
+.DS_Store
+*.swp
+.idea/
+.vscode/

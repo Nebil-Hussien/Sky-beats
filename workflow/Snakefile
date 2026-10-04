@@ -1,0 +1,108 @@
+# Sky Beats : master workflow.
+#
+# Run the whole project from the project root with:
+#
+#     snakemake --cores 1
+#
+# Each research question (RQ1..RQ9) lives in its own rule file under
+# workflow/rules/ and is included below. Shared steps live in common.smk.
+configfile: "config/config.yaml"
+
+
+include: "rules/common.smk"
+include: "rules/rq1.smk"
+include: "rules/rq2.smk"
+include: "rules/rq3.smk"
+include: "rules/rq4.smk"
+include: "rules/rq5.smk"
+include: "rules/rq6.smk"
+include: "rules/rq7.smk"
+include: "rules/rq8.smk"
+include: "rules/rq9.smk"
+
+
+# Aggregate target: the final outputs of every workflow.
+rule all:
+    input:
+        # ------------------------------------------------------------------
+        # RQ1 — sunshine vs valence correlation, seasonal breakdown
+        # ------------------------------------------------------------------
+        "results/workflow_1/sunshine_valence_correlation.csv",
+        "results/workflow_1/sunshine_valence_by_season.png",
+
+        # ------------------------------------------------------------------
+        # RQ2 — precipitation vs audio features
+        # ------------------------------------------------------------------
+        expand(
+            [
+                "results/workflow_2/kruskal_report_{feature}.png",
+                "results/workflow_2/kruskal_report_{feature}.md",
+                "results/workflow_2/spearman_report_{feature}.png",
+                "results/workflow_2/spearman_report_{feature}.md",
+                "results/workflow_2/bar_plot_{feature}.png",
+            ],
+            feature=RQ2_FEATURES,
+        ),
+
+        # ------------------------------------------------------------------
+        # RQ3 — genre shift: rainiest vs driest months
+        # ------------------------------------------------------------------
+        "results/workflow_3/genre_shift.csv",
+        "results/workflow_3/genre_shift.png",
+
+        # ------------------------------------------------------------------
+        # RQ4 — extreme temperature deviation vs audio features
+        # ------------------------------------------------------------------
+        expand(
+            [
+                "results/workflow_4/kruskal_extremes_{feature}.json",
+                "results/workflow_4/kruskal_extremes_{feature}.png",
+                "results/workflow_4/kruskal_extremes_{feature}.md",
+                "results/workflow_4/abs_dev_regression_{feature}.json",
+                "results/workflow_4/abs_dev_regression_{feature}.txt",
+                "results/workflow_4/abs_dev_regression_{feature}.png",
+                "results/workflow_4/abs_dev_regression_{feature}.md",
+            ],
+            feature=RQ4_FEATURES,
+        ),
+
+        # ------------------------------------------------------------------
+        # RQ5 — how accurately can temperature + sunshine predict energy?
+        # ------------------------------------------------------------------
+        # Track 1 outputs
+        "results/workflow_5/predict_report.png",
+        "results/workflow_5/predict_report.md",
+        # Track 2 outputs
+        expand(
+            "results/workflow_5/plot_{predictor}.png",
+            predictor=RQ5_FOCUS,
+        ),
+
+        # ------------------------------------------------------------------
+        # RQ6 — audio profile: gloomy vs clear days
+        # ------------------------------------------------------------------
+        "results/workflow_6/profile_comparison.csv",
+        "results/workflow_6/audio_profile_radar.png",
+
+        # ------------------------------------------------------------------
+        # RQ7 — daily weather attributes -> music mood + recommendations
+        # ------------------------------------------------------------------
+        "results/workflow_7/weather_model.pkl",
+        "results/workflow_7/weather_metrics.csv",
+        "results/workflow_7/song_recommendations.csv",
+        "results/workflow_7/feature_importances.png",
+
+        # ------------------------------------------------------------------
+        # RQ8 — does weather add predictive power beyond season alone?
+        # ------------------------------------------------------------------
+        "results/workflow_8/model_comparison.csv",
+        "results/workflow_8/model_comparison.png",
+
+        # ------------------------------------------------------------------
+        # RQ9 — reverse classification: infer weather from music
+        # ------------------------------------------------------------------
+        "results/workflow_9/metrics.csv",
+        "results/workflow_9/classifier_model.pkl",
+        "results/workflow_9/predictions.csv",
+        "results/workflow_9/feature_importance.csv",
+        "results/workflow_9/classifier_report.png",

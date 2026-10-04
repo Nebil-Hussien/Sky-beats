@@ -1,0 +1,11 @@
+# Weather inputs for Part B testing
+precipitation: 8.0
+sunshine_hours: 0.0
+temperature_mean_c: 4.0
+ 
+
+ #calendar settings for Part B testing
+is_weekend: 0
+day_of_week: 4
+month: 7
+is_holiday: 0

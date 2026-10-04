@@ -1,0 +1,40 @@
+# This CITATION.cff file was created following the Citation File Format
+# specification: https://citation-file-format.github.io/
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+title: "Sky Beats"
+abstract: >-
+  A Snakemake data-analysis workflow investigating the relationship between
+  German weather observations (DWD) and the mood and characteristics of the
+  music people stream (Spotify German Top 200 charts and audio features).
+type: software
+authors:
+  - family-names: "Mammadov"
+    given-names: "Khalid"
+    email: "khalid.mammadov@uni-potsdam.de"
+    affiliation: "University of Potsdam"
+  - family-names: "Hariri"
+    given-names: "Kimia"
+    email: "kimia.hariri@uni-potsdam.de"
+    affiliation: "University of Potsdam"
+  - family-names: "Gohel"
+    given-names: "Harsh"
+    email: "harsh.gohel@uni-potsdam.de"
+    affiliation: "University of Potsdam"
+  - family-names: "Hussien"
+    given-names: "Nebil"
+    email: "nebil.hussien@uni-potsdam.de"
+    affiliation: "University of Potsdam"
+repository-code: "https://gitup.uni-potsdam.de/mammadov/sky-beats"
+url: "https://gitup.uni-potsdam.de/mammadov/sky-beats"
+license: MIT
+version: "1.0"
+date-released: "2026-07-26"
+keywords:
+  - snakemake
+  - data-analysis
+  - weather
+  - music
+  - spotify
+  - dwd
+  - reproducible-research

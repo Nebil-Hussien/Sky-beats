@@ -1,0 +1,135 @@
+# ── Sky-Beats Project Configuration ───────────────────────────────────────────
+# Change settings here instead of editing the scripts directly.
+
+# ── Date Range ─────────────────────────────────────────────────────────────────
+dates:
+  start: "2017-01-01"
+  end:   "2021-12-31"
+
+# ── Paths ──────────────────────────────────────────────────────────────────────
+paths:
+  raw_dir:    "data/raw"
+  output_dir: "data"
+
+# ── DWD Weather Settings ───────────────────────────────────────────────────────
+dwd:
+  base_url: "https://opendata.dwd.de/climate_environment/CDC/observations_germany/climate/daily/kl/historical/"
+  columns:
+    - "MESS_DATUM"
+    - "RSK"
+    - "SDK"
+    - "TMK"
+  output_file: "dwd_daily_germany.csv"
+
+# ── Spotify Settings ──────────────────────────────────────────────────
+spotify:
+  charts_dataset:   "dhruvildave/spotify-charts"
+  features_dataset: "maharshipandya/-spotify-tracks-dataset"
+  charts_file:      "spotify_daily_tracks.csv"
+  features_file:    "spotify_tracks_features.csv"
+  kaggle_charts_file:   "charts.csv"      # Kaggle unzips to this name; we rename it to charts_file
+  kaggle_features_file: "dataset.csv"     # Kaggle unzips to this name; we rename it to features_file
+  region:           "Germany"
+  source:           "boxup"      # where to download raw data: "boxup" (no login) or "kaggle" (needs API token)
+  force_download:   false        # set true to re-download raw files even if they already exist
+  output_file:      "spotify_germany.csv"
+  audio_features:
+    - "track_id"
+    - "track_genre"
+    - "danceability"
+    - "energy"
+    - "tempo"
+    - "valence"
+    - "acousticness"
+    - "popularity"
+boxup:
+  share_url: "https://boxup.uni-potsdam.de/s/a749mA6DR6mqqXc"
+  share_password: "63qzA8QoDFMeAN3"
+    
+
+# ── Merge Settings ─────────────────────────────────────────────────────────────
+merge:
+  output_merged: "spotify_weather_merged.csv"
+  output_daily:  "spotify_weather_daily_merged.csv"
+
+# ── Per-workflow settings (namespaced by research question) ─────────────────────
+# RQ1: sunshine duration vs valence, per season
+rq1:
+  x_variable: sunshine_hours   # weather column (correlation x-axis)
+  y_variable: valence          # audio feature (correlation y-axis)
+  alpha: 0.05                  # significance level for flagging correlations
+
+# RQ2: precipitation vs audio features (Spearman + significance-driven plot)
+rq2:
+  x_variable: precipitation_mm          # continuous, used by Spearman
+  group_variable: precipitation_mm_cat  # 4-bin categorical, used by plots
+  bucket_method: percentile             # 'fixed' or 'percentile'
+  time_granularity: month_label         # 'week_label' or 'month_label'
+
+# RQ3: genre popularity shift, rainiest vs driest months
+rq3:
+  n_months: 12    # number of rainiest / driest months to compare per group
+  top_genres: 15  # number of genres (by largest absolute shift) to show
+
+# RQ4: extreme-temperature days vs audio features (Mann-Whitney + quantile regression)
+rq4:
+  x_variable: temperature_mean_c_extreme_hotcold  # binary Hot(1)/Cold(0), used by Mann-Whitney
+  extreme_method: percentile                      # 'fixed' or 'percentile'
+  time_granularity: month_label                   # 'week_label' or 'month_label'
+  quantiles:
+    - 0.10
+    - 0.25
+    - 0.50
+    - 0.75
+    - 0.90
+
+# RQ5: predict energy from weather (multiple regression) + seasonal effects
+rq5:
+  predictors: ['temperature_mean_c', 'precipitation_mm', 'sunshine_hours']
+  vif_threshold: 5.0
+  focus_predictors: ['temperature_mean_c', 'precipitation_mm', 'sunshine_hours']  # one plot per focus predictor
+
+# RQ6: audio profile on gloomy vs clear days (percentile-defined day types)
+rq6:
+  sun_low_pct:     25    # sunshine percentile at/below which a day counts as "dark"
+  sun_high_pct:    75    # sunshine percentile at/above which a day counts as "sunny"
+  precip_low_pct:  25    # precip percentile at/below which a day counts as "dry"
+  precip_high_pct: 75    # precip percentile at/above which a day counts as "wet"
+  audio_features:
+    - valence
+    - energy
+    - danceability
+    - acousticness
+    - tempo
+
+# RQ8: does weather predict mood beyond seasonal effects? (weather vs month-only baseline)
+rq8:
+  target: valence              # daily mean audio feature to predict
+  weather_features:            # columns added on top of the month baseline
+    - sunshine_hours
+    - precipitation_mm
+    - temperature_mean_c
+  test_fraction: 0.2           # chronological split: last 20% of days held out
+  random_seed: 42              # pinned seed for the stochastic models (NFR-1)
+  models:                      # estimators evaluated on both feature sets
+    - ridge
+    - random_forest
+
+# RQ9: predict the day's weather category (gloomy vs clear) from the audio profile
+rq9:
+  sun_low_pct:     25
+  sun_high_pct:    75
+  precip_low_pct:  25
+  precip_high_pct: 75
+  audio_features:              # predictors (the only inputs the classifier sees)
+    - valence
+    - energy
+    - danceability
+    - acousticness
+    - tempo
+  test_size:    0.25           # fraction of days held out for the test set
+  random_seed:  42             # fixes split + model randomness (NFR-1)
+  cv_folds:     5              # stratified cross-validation folds
+  models:                      # names must match the registry in train_classifier.py
+    - logistic_regression
+    - random_forest
